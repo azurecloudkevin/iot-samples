@@ -69,7 +69,4 @@ plugin_paths = DEPS_DIR.joinpath("omni_usd_resolver", args.config, "usd", "omniv
 os.environ["PXR_PLUGINPATH_NAME"] = str(plugin_paths)
 REQ_FILE = ROOT_DIR.joinpath("requirements.txt")
 subprocess.run(f"{PYTHON_EXE} -m pip install -r {REQ_FILE}", shell=True)
-result = subprocess.run(
-    [PYTHON_EXE, os.path.join(SCRIPT_DIR, "app.py")],
-    stderr=subprocess.STDOUT,
-)
+result = subprocess.run([PYTHON_EXE, os.path.join(SCRIPT_DIR, "app.py")], stderr=subprocess.STDOUT,)

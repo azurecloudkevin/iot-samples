@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import os
 import omni.ext
 import omni.ui as ui
 from pxr import Usd, Sdf, Tf, UsdGeom
@@ -26,6 +27,9 @@ import omni.ui.color_utils as cl
 
 TRANSLATE_OFFSET = "xformOp:translate:offset"
 ROTATE_SPIN = "xformOp:rotateX:spin"
+os.environ["OMNI_USER"] = "admin2"
+os.environ["OMNI_PASS"] = "Marsden1"
+os.environ["OMNI_HOST"] = "localhost"
 
 
 class uiTextStyles:
@@ -57,6 +61,7 @@ class LiveCube:
         if self._xform and not self._op:
             op = self._xform.AddTranslateOp(opSuffix="offset")
             op.Set(time=1, value=(0, -20.0, 0))
+            op.Set(time=96, value=(0, -450, 150))
             op.Set(time=192, value=(0, -950, 0))
             self._op = True
 
@@ -124,42 +129,42 @@ class OmniIotSamplePanelExtension(omni.ext.IExt):
         UsdGeom.SetStageUpAxis(self._stage, UsdGeom.Tokens.z)
 
         if live_layer_path:
-            live_layer = None
-            for sub_layer in self._stage.GetLayerStack():
-                if sub_layer.realPath == live_layer_path:
-                    live_layer = sub_layer
+            # live_layer = None
+            # for sub_layer in self._stage.GetLayerStack():
+            #     if sub_layer.realPath == live_layer_path:
+            #         live_layer = sub_layer
 
-            if live_layer:
-                live_layer.startTimeCode = 1
-                live_layer.endTimeCode = 192
-                # self._stage.SetEditTarget(live_layer)
-                self._iot_prim = self._stage.GetPrimAtPath("/iot")
-                self._cube = LiveCube(self._stage, "/World/Cube")
-                self._rollers = []
+            # if live_layer:
+            #     live_layer.startTimeCode = 1
+            #     live_layer.endTimeCode = 192
+            #     # self._stage.SetEditTarget(live_layer)
+            self._iot_prim = self._stage.GetPrimAtPath("/iot")
+            #     self._cube = LiveCube(self._stage, "/World/Cube")
+            #     self._rollers = []
 
-                for x in range(38):
-                    self._rollers.append(
-                        LiveRoller(self._stage, f"/World/Geometry/SM_ConveyorBelt_A08_Roller{x+1:02d}_01")
-                    )
+            #     for x in range(38):
+            #         self._rollers.append(
+            #             LiveRoller(self._stage, f"/World/Geometry/SM_ConveyorBelt_A08_Roller{x+1:02d}_01")
+            #         )
 
-                # this will capture when the select changes in the stage_selected_iot_prim_label
-                self._stage_event_sub = self._usd_context.get_stage_event_stream().create_subscription_to_pop(
-                    self._on_stage_event, name="Stage Update"
-                )
+            # this will capture when the select changes in the stage_selected_iot_prim_label
+            self._stage_event_sub = self._usd_context.get_stage_event_stream().create_subscription_to_pop(
+                self._on_stage_event, name="Stage Update"
+            )
 
-                # this will capture changes to the IoT data
-                self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
+            # this will capture changes to the IoT data
+            self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
 
-                # create an simple window with empty VStack for the IoT data
-                with self._window.frame:
-                    with ui.VStack():
-                        with ui.HStack(height=22):
-                            ui.Label("IoT Prim:", style=uiTextStyles.title, width=75)
-                            self._selected_iot_prim_label = ui.Label(" ", style=uiTextStyles.title)
-                        self._property_stack = ui.VStack(height=22)
+            # create an simple window with empty VStack for the IoT data
+            with self._window.frame:
+                with ui.VStack():
+                    with ui.HStack(height=22):
+                        ui.Label("IoT Prim:", style=uiTextStyles.title, width=75)
+                        self._selected_iot_prim_label = ui.Label(" ", style=uiTextStyles.title)
+                    self._property_stack = ui.VStack(height=22)
 
-                if self._iot_prim:
-                    self._on_selected_prim_changed()
+            if self._iot_prim:
+                self._on_selected_prim_changed()
 
     def on_shutdown(self):
         print("[omni.iot.sample.panel] shutdown")

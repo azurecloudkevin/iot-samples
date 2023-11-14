@@ -7,7 +7,12 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "args": [
+                "-u", "andre.ballard",
+                "-p", "Marsden1",
+                "-s", "nucleus.azurenucleus.co.uk"
+            ]
         },
         {
             "name": "Python: Attach to Omniverse (windows-x86_64/linux-x86_64)",
@@ -17,7 +22,6 @@
             "remoteRoot": "${workspaceFolder}",
             "port": 3000,
             "host": "localhost",
-            "subProcess": true,
             "runtimeArgs": [
                 "--preserve-symlinks",
                 "--preserve-symlinks-main"
