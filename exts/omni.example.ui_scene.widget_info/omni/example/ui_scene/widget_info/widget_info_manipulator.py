@@ -11,8 +11,8 @@ __all__ = ["WidgetInfoManipulator"]
 from omni.ui import color as cl
 from omni.ui import scene as sc
 import omni.ui as ui
-#import omni.usd
-from pxr import Usd, Sdf, UsdShade, Tf
+import omni.usd
+from pxr import Usd, Sdf, Tf
 
 
 class _ViewportLegacyDisableSelection:
@@ -77,13 +77,13 @@ class _DragGesture(sc.DragGesture):
 class WidgetInfoManipulator(sc.Manipulator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # BASE_URL = "omniverse://nucleus.azurenucleus.co.uk/Projects/OVPOC/Stages"
-        # LIVE_URL = f"{BASE_URL}/donut.live"
-        # self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
-        # self._usd_context = omni.usd.get_context()
-        # self._stage = self._usd_context.get_stage()
+        BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
+        LIVE_URL = f"{BASE_URL}/donut.live"
+        self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
+        self._usd_context = omni.usd.get_context()
+        self._stage = self._usd_context.get_stage()
         # self.alert = 0
-        #self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
+        self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
 
         self.destroy()
 
@@ -98,7 +98,18 @@ class WidgetInfoManipulator(sc.Manipulator):
         self._slider_subscription = None
         self._name_label = None
         self._name_telemtry1 = None
-
+        self._J0_label_name = None
+        self._J0_label_val = None
+        self._J1_label_name = None
+        self._J1_label_val = None
+        self._J2_label_name = None
+        self._J2_label_val = None
+        self._J3_label_name = None
+        self._J3_label_val = None
+        self._J4_label_name = None
+        self._J4_label_val = None
+        self._J5_label_name = None
+        self._J5_label_val = None
     # def _on_objects_changed(self, notice, stage):
     #     updated_objects = []
     #     for p in notice.GetChangedInfoOnlyPaths():
@@ -136,20 +147,23 @@ class WidgetInfoManipulator(sc.Manipulator):
                 self._name_label = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
 
                 with ui.HStack(width=0):
-                    ui.Label("name", name="prop_label", word_wrap=True, width=100)
-                    ui.Label("val", name="prop_value")
+                    self._J0_label_name = ui.Label("J0", name="prop_label", word_wrap=True, width=100)
+                    self._J0_label_val = ui.Label("", name="prop_value")
                 with ui.HStack(width=0):
-                    ui.Label("name", name="prop_label", word_wrap=True, width=100)
-                    ui.Label("val", name="prop_value")
+                    self._J1_label_name = ui.Label("J1", name="prop_label", word_wrap=True, width=100)
+                    self._J1_label_val = ui.Label("", name="prop_value")
                 with ui.HStack(width=0):
-                    ui.Label("name", name="prop_label", word_wrap=True, width=100)
-                    ui.Label("val", name="prop_value")
+                    self._J2_label_name = ui.Label("J2", name="prop_label", word_wrap=True, width=100)
+                    self._J2_label_val = ui.Label("", name="prop_value")
                 with ui.HStack(width=0):
-                    ui.Label("name", name="prop_label", word_wrap=True, width=100)
-                    ui.Label("val", name="prop_value")
+                    self._J3_label_name = ui.Label("J3", name="prop_label", word_wrap=True, width=100)
+                    self._J3_label_val = ui.Label("", name="prop_value")
                 with ui.HStack(width=0):
-                    ui.Label("name", name="prop_label", word_wrap=True, width=100)
-                    ui.Label("val", name="prop_value")
+                    self._J4_label_name = ui.Label("J4", name="prop_label", word_wrap=True, width=100)
+                    self._J4_label_val = ui.Label("", name="prop_value")
+                with ui.HStack(width=0):
+                    self._J5_label_name = ui.Label("J5", name="prop_label", word_wrap=True, width=100)
+                    self._J5_label_val = ui.Label("", name="prop_value")
 
                 ui.Spacer(height=2)
                 self._name_telemtry1 = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
@@ -192,3 +206,36 @@ class WidgetInfoManipulator(sc.Manipulator):
         # Update the shape name
         if self._name_label:
             self._name_label.text = f"Prim:{self.model.get_item('name')}"
+
+        if self._quality_label_val:
+            self._name_label.text = f"Prim:{self.model.get_item('name')}"
+
+    def _on_objects_changed(self, notice, stage):
+        updated_objects = []
+        for p in notice.GetChangedInfoOnlyPaths():
+            updated_objects.append(p)
+
+        if len(updated_objects) > 0:
+            self._update_frame(updated_objects)
+
+    def _update_frame(self, updated_objects):
+        try:
+            for o in updated_objects:
+                attr = self.live_layer.GetAttributeAtPath(o.pathString)
+                path = str(o.pathString)
+                if 'RobotPositionJ0' in path:
+                    self._J0_label_val.text = str(attr.default)
+                elif 'RobotPositionJ1' in path:
+                    self._J1_label_val.text = str(attr.default)
+                elif 'RobotPositionJ2' in path:
+                    self._J2_label_val.text = str(attr.default)
+                elif 'RobotPositionJ3' in path:
+                    self._J3_label_val.text = str(attr.default)
+                elif 'RobotPositionJ4' in path:
+                    self._J4_label_val.text = str(attr.default)
+                elif 'RobotPositionJ5' in path:
+                    self._J5_label_val.text = str(attr.default)
+                else:
+                    continue
+        except:
+            print()

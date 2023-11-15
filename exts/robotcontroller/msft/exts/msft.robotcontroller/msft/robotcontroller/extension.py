@@ -17,7 +17,7 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
     # this extension is located on filesystem.
     def on_startup(self, ext_id):
         print("[msft.omni.animate] msft omni animate startup")
-        BASE_URL = "omniverse://nucleus.azurenucleus.co.uk/Projects/OVPOC/Stages"
+        BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
         LIVE_URL = f"{BASE_URL}/donut.live"
         self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
         self._usd_context = omni.usd.get_context()

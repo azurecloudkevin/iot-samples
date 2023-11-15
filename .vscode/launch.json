@@ -11,7 +11,7 @@
             "args": [
                 "-u", "andre.ballard",
                 "-p", "Marsden1",
-                "-s", "nucleus.azurenucleus.co.uk"
+                "-s", "localhost"
             ]
         },
         {

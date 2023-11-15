@@ -85,7 +85,7 @@ class _DragGesture(sc.DragGesture):
 class WidgetInfoManipulator(sc.Manipulator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        BASE_URL = "omniverse://nucleus.azurenucleus.co.uk/Projects/OVPOC/Stages"
+        BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
         LIVE_URL = f"{BASE_URL}/donut.live"
         self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
         self._usd_context = omni.usd.get_context()
