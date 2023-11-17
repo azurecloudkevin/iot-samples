@@ -31,6 +31,19 @@ import pandas as pd
 from paho.mqtt import client as mqtt_client
 import random
 import json
+from dotenv import load_dotenv
+
+env = f"{Path(__file__).parents[2]}\\.env"
+
+load_dotenv(env)
+
+cert_path = os.getenv('sim_cert_path')
+key_path = os.getenv('sim_key_path')
+mqtt_host = os.getenv('ingest_mqtt_host')
+mqtt_port = int(os.getenv('ingest_mqtt_port'))
+mqtt_topic = os.getenv('ingest_mqtt_topic')
+mqtt_user = os.getenv('ingest_mqtt_user')
+iot_topic = os.getenv('iot_topic')
 
 OMNI_HOST = os.environ.get("OMNI_HOST", "localhost")
 BASE_URL = "omniverse://" + OMNI_HOST + "/Projects/OVPOC/Stages"
@@ -89,7 +102,7 @@ def create_live_layer(iot_topic):
     return live_layer
 
 
-async def initialize_async(iot_topic):
+async def initialize_async():
     # copy a the Conveyor Belt to the target nucleus server
     # LOCAL_URL = f"file:{CONTENT_DIR}/ConveyorBelt_{iot_topic}.usd"
     STAGE_URL = f"{BASE_URL}/houston_facility_{iot_topic}.usd"
@@ -158,9 +171,7 @@ def write_to_mqtt(mqtt_client, iot_topic, group, ts):
 
 
 # connect to mqtt broker
-def connect_mqtt(iot_topic):
-    topic = "alice-springs-solution/data/opc-ua-connector/opc-ua-connector-0/robot"
-
+def connect_mqtt():
     # called when a message arrives
     def on_message(client, userdata, msg):
         msg_content = msg.payload.decode()
@@ -171,8 +182,8 @@ def connect_mqtt(iot_topic):
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
             # connect to our topic
-            print(f"Subscribing to topic: {topic}")
-            client.subscribe(topic)
+            print(f"Subscribing to topic: {mqtt_topic}")
+            client.subscribe(mqtt_topic)
         else:
             print(f"Failed to connect, return code {rc}")
 
@@ -186,30 +197,28 @@ def connect_mqtt(iot_topic):
     client.on_connect = on_connect
     client.on_message = on_message
     client.on_subscribe = on_subscribe
-    client.username_pw_set(username='client2-authn-ID')
+    client.username_pw_set(username=mqtt_user)
     client.tls_set(
-        certfile='C:\\Workspaces\\iot-samples\\source\\ingest_app_mqtt\\client2-authn-ID.pem',
-        keyfile='C:\\Workspaces\\iot-samples\\source\\ingest_app_mqtt\\client2-authn-ID.key'
+        certfile=cert_path,
+        keyfile=key_path
     )
-    client.connect("simulated-plant-eg.eastus-1.ts.eventgrid.azure.net", 8883)
+    client.connect(mqtt_host, mqtt_port)
     client.loop_start()
     return client
 
 
-def run(stage, live_layer, iot_topic):
+def run(stage, live_layer):
     # we assume that the file contains the data for single device
-    connect_mqtt(iot_topic)
+    connect_mqtt()
 
 
 if __name__ == "__main__":
-    IOT_TOPIC = "donut"
-
     omni.client.initialize()
     omni.client.set_log_level(omni.client.LogLevel.DEBUG)
     omni.client.set_log_callback(log_handler)
     try:
-        stage, live_layer = asyncio.run(initialize_async(IOT_TOPIC))
-        run(stage, live_layer, IOT_TOPIC)
+        stage, live_layer = asyncio.run(initialize_async())
+        run(stage, live_layer)
         input()
     finally:
         omni.client.shutdown()

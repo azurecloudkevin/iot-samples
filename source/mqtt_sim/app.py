@@ -30,6 +30,18 @@ from paho.mqtt import client as mqtt_client
 from datetime import datetime
 import random
 import json
+from dotenv import load_dotenv
+
+env = f"{Path(__file__).parents[2]}\\.env"
+
+load_dotenv(env)
+
+cert_path = os.getenv('sim_cert_path')
+key_path = os.getenv('sim_key_path')
+mqtt_host = os.getenv('ingest_mqtt_host')
+mqtt_port = int(os.getenv('ingest_mqtt_port'))
+mqtt_topic = os.getenv('ingest_mqtt_topic')
+mqtt_user = os.getenv('sim_mqtt_user')
 
 OMNI_HOST = os.environ.get("OMNI_HOST", "localhost")
 BASE_URL = "omniverse://" + OMNI_HOST + "/Projects/OVPOC/Stages"
@@ -42,17 +54,6 @@ messages = []
 def log_handler(thread, component, level, message):
     # print(message)
     messages.append((thread, component, level, message))
-
-
-# publish to mqtt broker
-def write_to_mqtt(mqtt_client, iot_topic, group, ts):
-    # write the iot values to the usd prim attributes
-    topic = f"iot/{iot_topic}"
-    print(group.iloc[0]["TimeStamp"])
-    payload = {"_ts": ts}
-    for index, row in group.iterrows():
-        payload[row["Id"]] = row["Value"]
-    mqtt_client.publish(topic, json.dumps(payload, indent=2).encode("utf-8"))
 
 
 def start_sim(mqtt_client: mqtt_client):
@@ -101,7 +102,7 @@ def start_sim(mqtt_client: mqtt_client):
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ3", float(row[3]))
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ4", float(row[4]))
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ5", float(row[5]))
-                mqtt_client.publish("alice-springs-solution/data/opc-ua-connector/opc-ua-connector-0/robot", json.dumps(payload, indent=2).encode("utf-8"))
+                mqtt_client.publish(mqtt_topic, json.dumps(payload, indent=2).encode("utf-8"))
                 count = count + 1
             except ValueError:
                 continue
@@ -115,7 +116,7 @@ def populate_payload(payload: dict, path: str, val: float):
 
 # connect to mqtt broker
 def connect_mqtt():
-    topic = "alice-springs-solution/data/opc-ua-connector/opc-ua-connector-0/robot"
+    topic = mqtt_topic
 
     # called when a message arrives
     def on_message(client, userdata, msg):
@@ -141,12 +142,13 @@ def connect_mqtt():
     client.on_connect = on_connect
     client.on_message = on_message
     client.on_subscribe = on_subscribe
-    client.username_pw_set(username='sdm-authn-ID')
+
+    client.username_pw_set(username=mqtt_user)
     client.tls_set(
-        certfile='C:\\Workspaces\\iot-samples_102423\\source\\mqtt_sim\\sdm-authn-ID.pem',
-        keyfile='C:\\Workspaces\\iot-samples_102423\\source\\mqtt_sim\\sdm-authn-ID.key'
+        certfile=cert_path,
+        keyfile=key_path
     )
-    client.connect("simulated-plant-eg.eastus-1.ts.eventgrid.azure.net", 8883)
+    client.connect(mqtt_host, mqtt_port)
     client.loop_start()
     return client
 
