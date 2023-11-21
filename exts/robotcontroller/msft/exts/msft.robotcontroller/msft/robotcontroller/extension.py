@@ -1,28 +1,41 @@
+import os
 import omni.ext
 import omni.kit.commands
 import omni.usd
-from pxr import Usd, Sdf, Tf
+from pxr import Usd, Sdf, Tf, Gf
 import math
-from pxr import Gf
+from pathlib import Path
 from .robotmotion import RobotMotion
+from dotenv import load_dotenv
+
+env = f"{Path(__file__).parents[7]}\\.env"
+
+load_dotenv(env)
+
+host = os.getenv('omniverse_host')
+robot_base_path = os.getenv('robot_base_path')
+jointList = os.getenv('robot_joint_paths')
 
 
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
 # instantiated when extension gets enabled and `on_startup(ext_id)` will be called. Later when extension gets disabled
 # on_shutdown() is called.
 class MsftOmniAnimateExtension(omni.ext.IExt):
-    robot = RobotMotion('/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003', ['link1piv_003', 'link2piv_003', 'link3piv_003', 'link4piv_003','link5piv_003', 'link6piv_003'])
+    joints = str(jointList).replace(' ', '').split(',')
+    robot = RobotMotion(robot_base_path, joints)
 
     # ext_id is current extension id. It can be used with extension manager to query additional information, like where
     # this extension is located on filesystem.
     def on_startup(self, ext_id):
         print("[msft.omni.animate] msft omni animate startup")
-        BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
+        BASE_URL = f"omniverse://{host}/Projects/OVPOC/Stages"
         LIVE_URL = f"{BASE_URL}/donut.live"
         self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
         self._usd_context = omni.usd.get_context()
         self._stage = self._usd_context.get_stage()
-        self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
+        self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged,
+                                           self._on_objects_changed,
+                                           self._stage)
 
     def _get_context(self) -> Usd.Stage:
         # Get the UsdContext we are attached to
@@ -81,19 +94,19 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
         try:
             for o in updated_objects:
                 attr = self.live_layer.GetAttributeAtPath(o.pathString)
-                if("J0" in o.pathString):
-                    self.robot.SetAngleDegrees(0,attr.default)
-                elif("J1" in o.pathString):
-                    self.robot.SetAngleDegrees(1,attr.default)
-                elif("J2" in o.pathString):
-                    self.robot.SetAngleDegrees(2,attr.default)
-                elif("J3" in o.pathString):
-                    self.robot.SetAngleDegrees(3,attr.default)
-                elif("J4" in o.pathString):
-                    self.robot.SetAngleDegrees(4,attr.default)
-                elif("J5" in o.pathString):
-                    self.robot.SetAngleDegrees(5,attr.default)
+                if "J0" in o.pathString:
+                    self.robot.SetAngleDegrees(0, attr.default)
+                elif "J1" in o.pathString:
+                    self.robot.SetAngleDegrees(1, attr.default)
+                elif "J2" in o.pathString:
+                    self.robot.SetAngleDegrees(2, attr.default)
+                elif "J3" in o.pathString:
+                    self.robot.SetAngleDegrees(3, attr.default)
+                elif "J4" in o.pathString:
+                    self.robot.SetAngleDegrees(4, attr.default)
+                elif "J5" in o.pathString:
+                    self.robot.SetAngleDegrees(5, attr.default)
                 else:
                     continue
-        except:
+        except Exception:
             print()

@@ -19,7 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import os
 import omni.ext
 import omni.ui as ui
 from pxr import Usd, Sdf, Tf, UsdGeom
@@ -27,9 +26,6 @@ import omni.ui.color_utils as cl
 
 TRANSLATE_OFFSET = "xformOp:translate:offset"
 ROTATE_SPIN = "xformOp:rotateX:spin"
-os.environ["OMNI_USER"] = "admin2"
-os.environ["OMNI_PASS"] = "Marsden1"
-os.environ["OMNI_HOST"] = "localhost"
 
 
 class uiTextStyles:
@@ -193,16 +189,19 @@ class OmniIotSamplePanelExtension(omni.ext.IExt):
             self._property_stack.add_child(hStack)
             # repopulate the VStack with the IoT data attributes
             for prop in properties:
-                if x > 0 and x % 2 == 0:
-                    hStack = ui.HStack()
-                    self._property_stack.add_child(hStack)
-                prop_name = prop.GetName()
-                prop_value = prop.Get()
-                ui_button = ui.Button(f"{prop_name}\n{str(prop_value)}", style=uiButtonStyles.mainButton)
-                hStack.add_child(ui_button)
-                if prop_name == "Velocity":
-                    self._on_velocity_changed(prop_value)
-                x += 1
+                try:
+                    if x > 0 and x % 2 == 0:
+                        hStack = ui.HStack()
+                        self._property_stack.add_child(hStack)
+                    prop_name = prop.GetName()
+                    prop_value = prop.Get()
+                    ui_button = ui.Button(f"{prop_name}\n{str(prop_value)}", style=uiButtonStyles.mainButton)
+                    hStack.add_child(ui_button)
+                    if prop_name == "Velocity":
+                        self._on_velocity_changed(prop_value)
+                    x += 1
+                except Exception:
+                    print()
 
             if x % 2 != 0:
                 with hStack:

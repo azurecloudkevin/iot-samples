@@ -37,8 +37,8 @@ env = f"{Path(__file__).parents[2]}\\.env"
 
 load_dotenv(env)
 
-cert_path = os.getenv('sim_cert_path')
-key_path = os.getenv('sim_key_path')
+cert_path = os.getenv('ingest_cert_path')
+key_path = os.getenv('ingest_key_path')
 mqtt_host = os.getenv('ingest_mqtt_host')
 mqtt_port = int(os.getenv('ingest_mqtt_port'))
 mqtt_topic = os.getenv('ingest_mqtt_topic')
@@ -62,7 +62,8 @@ def initialize_device_prim(live_layer, iot_topic):
     iot_root = live_layer.GetPrimAtPath("/iot")
     iot_spec = live_layer.GetPrimAtPath(f"/iot/{iot_topic}")
     if not iot_spec:
-        iot_spec = Sdf.PrimSpec(iot_root, iot_topic, Sdf.SpecifierDef, "PickAndPlace Type")
+        iot_spec = Sdf.PrimSpec(iot_root, iot_topic, Sdf.SpecifierDef,
+                                "PickAndPlace Type")
     if not iot_spec:
         raise Exception("Failed to create the IoT Spec.")
 
@@ -75,7 +76,8 @@ def initialize_device_prim(live_layer, iot_topic):
     data.head()
 
     # create all the IoT attributes that will be written
-    attr = Sdf.AttributeSpec(iot_spec, "Timestamp", Sdf.ValueTypeNames.TimeCode)
+    attr = Sdf.AttributeSpec(iot_spec, "Timestamp",
+                             Sdf.ValueTypeNames.TimeCode)
     if not attr:
         raise Exception(f"Could not define the attribute: {attr}")
 
@@ -83,7 +85,8 @@ def initialize_device_prim(live_layer, iot_topic):
     # The values may be known in advance and can be hard coded
     grouped = data.groupby("Id")
     for attrName, group in grouped:
-        attr = Sdf.AttributeSpec(iot_spec, clean_text(attrName), Sdf.ValueTypeNames.Double)
+        attr = Sdf.AttributeSpec(iot_spec, clean_text(attrName),
+                                 Sdf.ValueTypeNames.Double)
         if not attr:
             raise Exception(f"Could not define the attribute: {attrName}")
 
@@ -97,7 +100,7 @@ def create_live_layer(iot_topic):
     if not live_layer:
         raise Exception(f"Could load the live layer {LIVE_URL}.")
 
-    iot_root = Sdf.PrimSpec(live_layer, "iot", Sdf.SpecifierDef, "IoT Root")
+    Sdf.PrimSpec(live_layer, "iot", Sdf.SpecifierDef, "IoT Root")
     live_layer.Save()
     return live_layer
 
