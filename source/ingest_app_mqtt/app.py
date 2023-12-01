@@ -148,7 +148,7 @@ def write_to_live(live_layer, iot_topic, msg_content):
     # write the iot values to the usd prim attributes
     payload = json.loads(msg_content)
     with Sdf.ChangeBlock():
-        for i, (id, value) in enumerate(payload["Payload"].items()):
+        for i, (id, value) in enumerate(payload["payload"].items()):
             attr = live_layer.GetAttributeAtPath(f"/iot/{iot_topic}.{clean_text(id)}")
             if not attr:
                 raise Exception(f"Could not find attribute /iot/{iot_topic}.{id}.")

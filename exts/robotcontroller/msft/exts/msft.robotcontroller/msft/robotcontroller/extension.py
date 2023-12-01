@@ -6,6 +6,7 @@ from pxr import Usd, Sdf, Tf, Gf
 import math
 from pathlib import Path
 from .robotmotion import RobotMotion
+import omni.kit.usd.layers as layers
 from dotenv import load_dotenv
 
 env = f"{Path(__file__).parents[7]}\\.env"
@@ -33,6 +34,15 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
         self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
         self._usd_context = omni.usd.get_context()
         self._stage = self._usd_context.get_stage()
+        self._live_syncing = layers.get_live_syncing(self._usd_context)
+
+        self._layers = layers.get_layers(self._usd_context)
+        self._sessionLayer = self._stage.GetSessionLayer()
+
+        self._sessionLayer.startTimeCode = 1
+        self._sessionLayer.endTimeCode = 192
+
+        self._iot_prim = self._stage.GetPrimAtPath("/iot")
         self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged,
                                            self._on_objects_changed,
                                            self._stage)
@@ -93,20 +103,25 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
     def _update_frame(self, updated_objects):
         try:
             for o in updated_objects:
-                attr = self.live_layer.GetAttributeAtPath(o.pathString)
-                if "J0" in o.pathString:
-                    self.robot.SetAngleDegrees(0, attr.default)
-                elif "J1" in o.pathString:
-                    self.robot.SetAngleDegrees(1, attr.default)
-                elif "J2" in o.pathString:
-                    self.robot.SetAngleDegrees(2, attr.default)
-                elif "J3" in o.pathString:
-                    self.robot.SetAngleDegrees(3, attr.default)
-                elif "J4" in o.pathString:
-                    self.robot.SetAngleDegrees(4, attr.default)
-                elif "J5" in o.pathString:
-                    self.robot.SetAngleDegrees(5, attr.default)
-                else:
-                    continue
-        except Exception:
-            print()
+                #attr = self.live_layer.GetAttributeAtPath(o.pathString)
+                prim = self._stage.GetPrimAtPath(o.pathString.split('.')[0])
+                attr = prim.GetAttribute(o.pathString.split('.')[1])
+                if "Value" in o.pathString:
+                    val = float(attr.Get())
+                    # attr = self._sessionLayer.GetAttributeAtPath(o.pathString)
+                    if "j0" in o.pathString:
+                        self.robot.SetAngleDegrees(0, val)
+                    elif "j1" in o.pathString:
+                        self.robot.SetAngleDegrees(1, val)
+                    elif "j2" in o.pathString:
+                        self.robot.SetAngleDegrees(2, val)
+                    elif "j3" in o.pathString:
+                        self.robot.SetAngleDegrees(3, val)
+                    elif "j4" in o.pathString:
+                        self.robot.SetAngleDegrees(4, val)
+                    elif "j5" in o.pathString:
+                        self.robot.SetAngleDegrees(5, val)
+                    else:
+                        continue
+        except Exception as e:
+            print(f"An error occurred: {e}")

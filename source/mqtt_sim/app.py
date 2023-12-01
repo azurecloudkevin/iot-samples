@@ -66,20 +66,21 @@ def start_sim(mqtt_client: mqtt_client):
                 date = str(datetime.now())
                 payload = {}
                 payload["TimeStamp"] = date
-                payload["Payload"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:LoadingCycleCount"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:UnloadingCycleCount"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:VacuumPressure"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:Quality"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:Fault"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:Vacuum_Alert"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ0"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ1"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ2"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ3"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ4"] = {}
-                payload["Payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ5"] = {}
+                payload["payload"] = {}
+                payload["dataSetWriterName"] = 'Robot'
+                payload["payload"]["dtmi:com:example:Magnemotion;1:LoadingCycleCount"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:UnloadingCycleCount"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:VacuumPressure"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:Quality"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:Fault"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:Vacuum_Alert"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ0"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ1"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ2"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ3"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ4"] = {}
+                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ5"] = {}
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadingCycleCount", float(50))
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:UnloadingCycleCount", float(50))
                 populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn", float(1))
@@ -110,8 +111,8 @@ def start_sim(mqtt_client: mqtt_client):
 
 
 def populate_payload(payload: dict, path: str, val: float):
-    payload["Payload"][path]["Value"] = val
-    payload["Payload"][path]["SourceTimeStamp"] = payload["TimeStamp"]
+    payload["payload"][path]["Value"] = val
+    payload["payload"][path]["SourceTimeStamp"] = payload["TimeStamp"]
 
 
 # connect to mqtt broker
