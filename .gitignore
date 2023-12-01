@@ -25,7 +25,7 @@ source/mqtt_sim/sdm-authn-ID.key
 .gitignore
 source/ingest_app_mqtt/client2-authn-ID.key
 source/ingest_app_mqtt/client2-authn-ID.pem
-exts/omni.iot.sample.ingestor/omni/iot/sample/ingestor/client2-authn-ID.key
-exts/omni.iot.sample.ingestor/omni/iot/sample/ingestor/client2-authn-ID.pem
-source/mqtt_sim/sdm-authn-ID.pem
-source/mqtt_sim/sdm-authn-ID.key
+exts/*/*.key
+exts/*/*.pem
+source/*/*.pem
+source/*/*.key
