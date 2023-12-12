@@ -6,6 +6,7 @@ from pxr import Usd, Sdf, Tf, Gf
 import math
 from pathlib import Path
 from .robotmotion import RobotMotion
+from .mesh_materials import MeshMaterials
 import omni.kit.usd.layers as layers
 from dotenv import load_dotenv
 
@@ -46,6 +47,8 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
         self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged,
                                            self._on_objects_changed,
                                            self._stage)
+        self._mesh_materials = MeshMaterials()
+        self._mesh_materials.start()
 
     def _get_context(self) -> Usd.Stage:
         # Get the UsdContext we are attached to
@@ -121,6 +124,11 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
                         self.robot.SetAngleDegrees(4, val)
                     elif "j5" in o.pathString:
                         self.robot.SetAngleDegrees(5, val)
+                    elif "VacuumPressure" in o.pathString:
+                        if val > 0:
+                            self._mesh_materials.highlight_prim(prim_path=prim)
+                        else:
+                            self._mesh_materials.clear_prim_highlight(prim)
                     else:
                         continue
         except Exception as e:
