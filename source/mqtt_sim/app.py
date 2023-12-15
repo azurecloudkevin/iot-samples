@@ -59,55 +59,56 @@ def log_handler(thread, component, level, message):
 def start_sim(mqtt_client: mqtt_client):
     count = 0
     alert_enabled = False
-    with open(SCRIPT_DIR + "\\pos.csv", 'r', encoding='UTF-8') as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-            try:
-                date = str(datetime.now())
-                payload = {}
-                payload["TimeStamp"] = date
-                payload["payload"] = {}
-                payload["dataSetWriterName"] = 'Robot'
-                payload["payload"]["dtmi:com:example:Magnemotion;1:LoadingCycleCount"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:UnloadingCycleCount"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:VacuumPressure"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:Quality"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:Fault"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:Vacuum_Alert"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ0"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ1"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ2"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ3"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ4"] = {}
-                payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ5"] = {}
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadingCycleCount", float(50))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:UnloadingCycleCount", float(50))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn", float(1))
+    while (True):
+        with open(SCRIPT_DIR + "\\pos.csv", 'r', encoding='UTF-8') as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                try:
+                    date = str(datetime.now())
+                    payload = {}
+                    payload["TimeStamp"] = date
+                    payload["payload"] = {}
+                    payload["dataSetWriterName"] = 'Robot'
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:LoadingCycleCount"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:UnloadingCycleCount"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:VacuumPressure"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:Quality"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:Fault"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:Vacuum_Alert"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ0"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ1"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ2"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ3"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ4"] = {}
+                    payload["payload"]["dtmi:com:example:Magnemotion;1:RobotPositionJ5"] = {}
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadingCycleCount", float(50))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:UnloadingCycleCount", float(50))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:LoadedCounterPowerOn", float(1))
 
-                if count % 100 == 0:
-                    alert_enabled = not alert_enabled
+                    if count % 100 == 0:
+                        alert_enabled = not alert_enabled
 
-                if alert_enabled:
-                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:VacuumPressure", float(0))
-                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:Vacuum_Alert", float(1))
-                else:
-                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:VacuumPressure", float(1))
-                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:Vacuum_Alert", float(0))
+                    if alert_enabled:
+                        populate_payload(payload, "dtmi:com:example:Magnemotion;1:VacuumPressure", float(0))
+                        populate_payload(payload, "dtmi:com:example:Magnemotion;1:Vacuum_Alert", float(1))
+                    else:
+                        populate_payload(payload, "dtmi:com:example:Magnemotion;1:VacuumPressure", float(1))
+                        populate_payload(payload, "dtmi:com:example:Magnemotion;1:Vacuum_Alert", float(0))
 
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:Quality", float(1))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:Fault", float(1))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ0", float(row[0]))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ1", float(row[1]))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ2", float(row[2]))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ3", float(row[3]))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ4", float(row[4]))
-                populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ5", float(row[5]))
-                mqtt_client.publish(mqtt_topic, json.dumps(payload, indent=2).encode("utf-8"))
-                count = count + 1
-            except ValueError:
-                continue
-            time.sleep(.1)
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:Quality", float(1))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:Fault", float(1))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ0", float(row[0]))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ1", float(row[1]))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ2", float(row[2]))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ3", float(row[3]))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ4", float(row[4]))
+                    populate_payload(payload, "dtmi:com:example:Magnemotion;1:RobotPositionJ5", float(row[5]))
+                    mqtt_client.publish(mqtt_topic, json.dumps(payload, indent=2).encode("utf-8"))
+                    count = count + 1
+                except ValueError:
+                    continue
+                time.sleep(.1)
 
 
 def populate_payload(payload: dict, path: str, val: float):
