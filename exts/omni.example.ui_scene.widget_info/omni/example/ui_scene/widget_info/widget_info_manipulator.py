@@ -12,6 +12,8 @@ from omni.ui import color as cl
 from omni.ui import scene as sc
 import omni.ui as ui
 import omni.usd
+import omni.kit.usd.layers as layers
+from omni.kit.viewport_widgets_manager.widget_provider import WidgetProvider as WP
 from pxr import Usd, Sdf, Tf
 
 
@@ -74,14 +76,24 @@ class _DragGesture(sc.DragGesture):
         self.__disable_selection = None
 
 
-class WidgetInfoManipulator(sc.Manipulator):
+class WidgetInfoManipulator(WP):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
-        LIVE_URL = f"{BASE_URL}/donut.live"
-        self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
+        #super().__init__(**kwargs)
+        # BASE_URL = "omniverse://localhost/Projects/OVPOC/Stages"
+        # LIVE_URL = f"{BASE_URL}/donut.live"
+        #self.live_layer = Sdf.Layer.FindOrOpen(LIVE_URL)
         self._usd_context = omni.usd.get_context()
         self._stage = self._usd_context.get_stage()
+
+        self._live_syncing = layers.get_live_syncing(self._usd_context)
+
+        self._layers = layers.get_layers(self._usd_context)
+        self._sessionLayer = self._stage.GetSessionLayer()
+
+        self._sessionLayer.startTimeCode = 1
+        self._sessionLayer.endTimeCode = 192
+
+        self._iot_prim = self._stage.GetPrimAtPath("/iot")
         # self.alert = 0
         self.listener = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, self._stage)
 
@@ -110,6 +122,14 @@ class WidgetInfoManipulator(sc.Manipulator):
         self._J4_label_val = None
         self._J5_label_name = None
         self._J5_label_val = None
+        self._robot_quality_name = None
+        self._robot_quality_val = None
+        self._pressure_name = None
+        self._pressure_val = None
+        self._alert_name = None
+        self._alert_val = None
+        self._scrollingFrame = None
+        self._zstack = None
     # def _on_objects_changed(self, notice, stage):
     #     updated_objects = []
     #     for p in notice.GetChangedInfoOnlyPaths():
@@ -130,45 +150,107 @@ class WidgetInfoManipulator(sc.Manipulator):
     #         else:
     #             continue
 
+    # create a main windowwindow = ui.create_window(title='Sparkline Example', width=400, height=300)# create a sparkline widgetsparkline = ui.Sparkline(parent=window, name='sparkline', data=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])# set the style sheet of the sparkline widgetui.set_style(sparkline, 'Sparkline { line-color: red; line-width: 2px; line-shape: smooth; }')
+
     def _on_build_widgets(self):
-        with ui.ZStack():
-            ui.Rectangle(
+        def on_mouse_wheel(x, y, modifier):
+            if modifier == omni.input.KeyboardModifierFlags.SHIFT:
+                # scroll horizontally
+                scroll_x = max(0, min(self._scrollingFrame.scroll_x - x, self._scrollingFrame.scroll_x_max))
+                self._scrollingFrame.scroll_to(scroll_x, self._scrollingFrame.scroll_y)
+            else:
+                # scroll vertically
+                scroll_y = max(0, min(self._scrollingFrame.scroll_y - y, self._scrollingFrame.scroll_y_max))
+                self._scrollingFrame.scroll_to(self._scrollingFrame.scroll_x, scroll_y)
+
+        self._zstack = ui.ZStack()
+        self._scrollingFrame = ui.ScrollingFrame(
                 style={
                     "background_color": cl("#000000bf"),
+                    "border_width": 10,
                     "border_color": cl(0.7),
-                    "border_width": 0,
                     "border_radius": 4,
-                }
+                    "scrollbar_policy": ui.ScrollBarPolicy.SCROLLBAR_ALWAYS_ON,
+                    "scrollbar_width": 100,
+                    "scrollbar_color": cl(0.9),
+                    "scrollbar_background_color": cl(0.3),
+                },
             )
-            with ui.VStack(style={"font_size": 28,"margin": 8}):
+
+        # self._zstack.call_mouse_wheel_fn(on_mouse_wheel)
+        with self._zstack:
+            with self._scrollingFrame:
+                ui.Rectangle(
+                    width=800,
+                    height=800,
+                    style={
+                        "background_color": cl("#000000bf"),
+                        "border_color": cl(0.7),
+                        "border_width": 0,
+                        "border_radius": 4,
+                    }
+                )
+                with ui.VStack(style={"font_size": 28,"margin": 8}):
+                    ui.Spacer(height=2)
+                    self._name_label = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
+                    # sparkline = ui.Sparkline(parent=window, name='sparkline', data=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                    # data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                    # with ui.HStack():
+                    #     ui.Spacer(width=200) # align the sparklines with the scrollable frame
+                    #     for value in data:
+                    #         with ui.VStack():
+                    #             ui.Sparkline(
+                    #                 data=[value],
+                    #                 style={
+                    #                     "sparkline_type": 0,
+                    #                     "sparkline_color": cl(0.9),
+                    #                     "sparkline_width": 2,
+                    #                     "marker_color": cl(0.9),
+                    #                     "marker_size": 4,
+                    #                     "show_markers": True,
+                    #                 },
+                    #             )
+                    #         ui.Label(str(value), alignment=ui.Alignment.CENTER)
+
+                    with ui.HStack(width=0):
+                        self._J0_label_name = ui.Label("J0", name="prop_label", word_wrap=True, width=100)
+                        self._J0_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._J1_label_name = ui.Label("J1", name="prop_label", word_wrap=True, width=100)
+                        self._J1_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._J2_label_name = ui.Label("J2", name="prop_label", word_wrap=True, width=100)
+                        self._J2_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._J3_label_name = ui.Label("J3", name="prop_label", word_wrap=True, width=100)
+                        self._J3_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._J4_label_name = ui.Label("J4", name="prop_label", word_wrap=True, width=100)
+                        self._J4_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._J5_label_name = ui.Label("J5", name="prop_label", word_wrap=True, width=100)
+                        self._J5_label_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._robot_quality_name = ui.Label("quality", name="prop_label", word_wrap=True, width=100)
+                        self._robot_quality_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._pressure_name = ui.Label("pressure", name="prop_label", word_wrap=False, width=100)
+                        self._pressure_val = ui.Label("", name="prop_value")
+                    with ui.HStack(width=0):
+                        self._alert_name = ui.Label("alert", name="prop_label", word_wrap=True, width=100)
+                        self._alert_val = ui.Label("", name="prop_value")
 
 
-                ui.Spacer(height=2)
-                self._name_label = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
 
-                with ui.HStack(width=0):
-                    self._J0_label_name = ui.Label("J0", name="prop_label", word_wrap=True, width=100)
-                    self._J0_label_val = ui.Label("", name="prop_value")
-                with ui.HStack(width=0):
-                    self._J1_label_name = ui.Label("J1", name="prop_label", word_wrap=True, width=100)
-                    self._J1_label_val = ui.Label("", name="prop_value")
-                with ui.HStack(width=0):
-                    self._J2_label_name = ui.Label("J2", name="prop_label", word_wrap=True, width=100)
-                    self._J2_label_val = ui.Label("", name="prop_value")
-                with ui.HStack(width=0):
-                    self._J3_label_name = ui.Label("J3", name="prop_label", word_wrap=True, width=100)
-                    self._J3_label_val = ui.Label("", name="prop_value")
-                with ui.HStack(width=0):
-                    self._J4_label_name = ui.Label("J4", name="prop_label", word_wrap=True, width=100)
-                    self._J4_label_val = ui.Label("", name="prop_value")
-                with ui.HStack(width=0):
-                    self._J5_label_name = ui.Label("J5", name="prop_label", word_wrap=True, width=100)
-                    self._J5_label_val = ui.Label("", name="prop_value")
+                    ui.Spacer(height=2)
+                    self._name_telemtry1 = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
 
-                ui.Spacer(height=2)
-                self._name_telemtry1 = ui.Label("", height=0, alignment=ui.Alignment.CENTER)
+                    ui.Spacer(height=10)
 
-                ui.Spacer(height=10)
+        self._scrollingFrame.set_mouse_wheel_fn(on_mouse_wheel)
+
+        # self._scrollingFrame = ui.ScrollingFrame
+        # self._scrollingFrame.set_mouse_wheel_fn(on_mouse_wheel)
 
 
         self.on_model_updated(None)
@@ -184,7 +266,7 @@ class WidgetInfoManipulator(sc.Manipulator):
                 with sc.Transform(transform=sc.Matrix44.get_translation_matrix(0, 100, 0)):
                     # Label
                     with sc.Transform(look_at=sc.Transform.LookAt.CAMERA):
-                        self._widget = sc.Widget(600, 405, update_policy=sc.Widget.UpdatePolicy.ON_MOUSE_HOVERED)
+                        self._widget = sc.Widget(600, 405, update_policy=sc.Widget.UpdatePolicy.ALWAYS)
                         self._widget.frame.set_build_fn(self._on_build_widgets)
 
     def on_model_updated(self, _):
@@ -207,8 +289,8 @@ class WidgetInfoManipulator(sc.Manipulator):
         if self._name_label:
             self._name_label.text = f"Prim:{self.model.get_item('name')}"
 
-        if self._quality_label_val:
-            self._name_label.text = f"Prim:{self.model.get_item('name')}"
+        # if self._quality_label_val:
+        #     self._name_label.text = f"Prim:{self.model.get_item('name')}"
 
     def _on_objects_changed(self, notice, stage):
         updated_objects = []
@@ -221,21 +303,34 @@ class WidgetInfoManipulator(sc.Manipulator):
     def _update_frame(self, updated_objects):
         try:
             for o in updated_objects:
-                attr = self.live_layer.GetAttributeAtPath(o.pathString)
-                path = str(o.pathString)
-                if 'RobotPositionJ0' in path:
-                    self._J0_label_val.text = str(attr.default)
-                elif 'RobotPositionJ1' in path:
-                    self._J1_label_val.text = str(attr.default)
-                elif 'RobotPositionJ2' in path:
-                    self._J2_label_val.text = str(attr.default)
-                elif 'RobotPositionJ3' in path:
-                    self._J3_label_val.text = str(attr.default)
-                elif 'RobotPositionJ4' in path:
-                    self._J4_label_val.text = str(attr.default)
-                elif 'RobotPositionJ5' in path:
-                    self._J5_label_val.text = str(attr.default)
-                else:
-                    continue
-        except:
-            print()
+                if "Value" in str(o.pathString):
+                    prim = self._stage.GetPrimAtPath(o.pathString.split('.')[0])
+                    attr = prim.GetAttribute(o.pathString.split('.')[1])
+
+                    if attr is None:
+                        continue
+
+                    val = str(attr.Get())
+                    # path = str(o.pathString)
+                    if 'j0' in o.pathString:
+                        self._J0_label_val.text = val
+                    elif 'j1' in o.pathString:
+                        self._J1_label_val.text = val
+                    elif 'j2' in o.pathString:
+                        self._J2_label_val.text = val
+                    elif 'j3' in o.pathString:
+                        self._J3_label_val.text = val
+                    elif 'j4' in o.pathString:
+                        self._J4_label_val.text = val
+                    elif 'j5' in o.pathString:
+                        self._J5_label_val.text = val
+                    elif 'quality' in o.pathString:
+                        self._robot_quality_val.text = val
+                    elif 'pressure' in o.pathString:
+                        self._pressure_val.text = val
+                    elif 'alert' in o.pathString:
+                        self._alert_val.text = val
+                    else:
+                        continue
+        except Exception as e:
+            print(f'Failed to update frame {e}')
