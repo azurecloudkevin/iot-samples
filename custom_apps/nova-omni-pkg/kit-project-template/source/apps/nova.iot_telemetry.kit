@@ -1,0 +1,91 @@
+[package]
+title = "Robot Motion"
+
+version = "1.0.0"
+
+description = """This application pulls in data from MQTT broker"""
+
+# Keywords make  it browseable in UI using the "experience" filter
+keywords = ["app"]
+
+[dependencies]
+# Create Kit UI Based applications
+"omni.kit.window.extensions" = {}
+"omni.kit.menu.file" = {}
+"omni.app.setup" = {order = -6000}
+# Viewport Bundle
+"omni.kit.viewport.bundle" = {order = -5000}
+"omni.resourcemonitor" = {}
+#### Stage
+"omni.kit.window.stage" = {}
+
+# "omni.example.ui_scene.widget_info" = {}
+# "omni.iot.sample.panel" = {}
+
+# debug
+"omni.kit.window.console" = {}
+
+
+# Enable RTX for your viewport
+"omni.hydra.rtx" = {order = -4999}
+
+# Vulkan shader caches
+"omni.rtx.shadercache.vulkan" = {}
+
+# VS Code debug 
+"omni.kit.debug.vscode" = {order = -1000}
+
+# DX shader caches (windows only)
+[dependencies."filter:platform"."windows-x86_64"]
+"omni.rtx.shadercache.d3d12" = {}
+
+#"omni.iot.sample.panel" = {}
+# robot arm movement
+# "msft.robotcontroller" = {order = 1000}
+
+[settings]
+# here you can choose what renderers are enabled
+renderer.enabled='rtx'
+renderer.active='rtx'
+app.kit.editor.setup = true
+app.layout.default = "${app}/../default_layout.json"
+
+[settings.app]
+fastShutdown = true
+content.emptyStageOnStart = true
+exts."omni.kit.viewport.window".startup.windowName = "Viewport"
+exts."omni.kit.renderer.core".compatibilityMode = true
+#layout.default = "${app}/../default_layout.json"
+extensions.installUntrustedExtensions=true
+
+# Register extension folders from this repo in kit
+# These are the paths where Kit looks for extensions
+# Your application is using Extensions from your application
+# Here they are setup into a single folder "source/extensions" but you can have you own structure if you need
+# see we also add the Extension from the Base application using their extscache
+[settings.app.exts]
+folders.'++' = ["${app}/../extensions"]
+
+# Public extension registries
+[settings.exts."omni.kit.registry.nucleus"]
+registries = [
+    { name = "kit/default", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/shared" },
+    { name = "kit/sdk", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/sdk/${kit_version_short}/${kit_git_hash}" },
+]
+
+
+########################################################################################################################
+# BEGIN GENERATED PART (Remove from 'BEGIN' to 'END' to regenerate)
+########################################################################################################################
+
+# Kit SDK Version: 105.0.1+release.109416.fc39ae6e.tc
+
+# Version lock for all dependencies:
+[settings.app.exts]
+enabled = [
+	"omni.hello.world"    
+]
+
+########################################################################################################################
+# END GENERATED PART
+########################################################################################################################
