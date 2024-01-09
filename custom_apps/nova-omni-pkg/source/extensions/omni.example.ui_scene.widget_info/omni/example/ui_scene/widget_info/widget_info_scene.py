@@ -9,6 +9,7 @@
 __all__ = ["WidgetInfoScene"]
 
 import omni.ui as ui
+from .widget_info import InfoWidgetProvider
 from omni.ui import scene as sc
 
 from .widget_info_model import WidgetInfoModel
@@ -28,10 +29,17 @@ class WidgetInfoScene():
             self._scene_view = sc.SceneView()
             # Add the manipulator into the SceneView's scene
             with self._scene_view.scene:
-                WidgetInfoManipulator(model=WidgetInfoModel())
+                self._info = InfoWidgetProvider()
+                self._info.build_widget(self._viewport_window)
+                #self._manipulator = WidgetInfoManipulator(model=WidgetInfoModel())
+
 
             # Register the SceneView with the Viewport to get projection and view updates
             self._viewport_window.viewport_api.add_scene_view(self._scene_view)
+
+    def dummy(self, x, y, modifier):
+        print()
+        # self._manipulator.on_mouse_wheel(x,y,modifier)
 
     def __del__(self):
         self.destroy()

@@ -32,8 +32,9 @@ keywords = ["app"]
 # Vulkan shader caches
 "omni.rtx.shadercache.vulkan" = {}
 
-# VS Code debug 
+# VS Code debug
 "omni.kit.debug.vscode" = {order = -1000}
+
 
 # DX shader caches (windows only)
 [dependencies."filter:platform"."windows-x86_64"]
@@ -49,6 +50,7 @@ renderer.enabled='rtx'
 renderer.active='rtx'
 app.kit.editor.setup = true
 app.layout.default = "${app}/../default_layout.json"
+exts."omni.kit.camera".camera.zoomSpeed = 0
 
 [settings.app]
 fastShutdown = true
@@ -83,7 +85,7 @@ registries = [
 # Version lock for all dependencies:
 [settings.app.exts]
 enabled = [
-	"omni.hello.world"    
+	"omni.hello.world"
 ]
 
 ########################################################################################################################
