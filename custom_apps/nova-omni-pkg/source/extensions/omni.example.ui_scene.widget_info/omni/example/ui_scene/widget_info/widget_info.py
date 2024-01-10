@@ -1,8 +1,7 @@
 import omni.ui as ui
 import omni.usd
-import carb
-import math
 import time
+import statistics
 from threading import Timer
 from omni.ui import color as cl
 from pxr import Usd, Tf, UsdGeom, UsdShade
@@ -17,7 +16,7 @@ class InfoWidgetProvider():
         self.start = time.time()
         self.end = time.time()
         self.is_pinned = False
-        self.history = [0]
+        self.history = [0.0]
         self.usd_context = omni.usd.get_context()
         self.stage = self.usd_context.get_stage()
         self.stage_event_sub = omni.usd.get_context().get_stage_event_stream().create_subscription_to_pop(
@@ -44,13 +43,14 @@ class InfoWidgetProvider():
         prim = self.stage.GetPrimAtPath(prim_paths[0])
 
         if prim.IsA(UsdGeom.Imageable):
-            material, relationship = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()
-            if material:
-                self.material_name = str(material.GetPath())
-            else:
-                self.material_name = "N/A"
+            if '/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1' in prim_paths[0]:
+                material, relationship = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()
+                if material:
+                    self.material_name = str(material.GetPath())
+                else:
+                    self.material_name = "N/A"
 
-            self._placer.visible = True
+                self._placer.visible = True
         else:
             self._prim = None
             return
@@ -77,8 +77,9 @@ class InfoWidgetProvider():
     def _widget_header(self):
         with self._ui_header_frame:
             with ui.Stack(ui.Direction.RIGHT_TO_LEFT):
-                ui.Button(text=" x ", width=0, height=0, clicked_fn=lambda *args: self.close())
-                ui.Label("IoT Data", name="prop_label", word_wrap=True, width=390, alignment=ui.Alignment.CENTER, style={"font":"${fonts}/OpenSans-SemiBold.ttf", "font_size": 40.0})
+                ui.Button(text=" X ", width=0, height=0, clicked_fn=lambda *args: self.close(), alignment = ui.Alignment.RIGHT, style={"font":"${fonts}/OpenSans-SemiBold.ttf", "font_size": 60.0})
+                ui.Label("IoT Data", name="prop_label", word_wrap=True, width=430, alignment=ui.Alignment.CENTER, style={"font":"${fonts}/OpenSans-SemiBold.ttf", "font_size": 40.0})
+
                 #ui.Button(text="Unpin" if self.is_pinned else "Pin", width=0, height=0, clicked_fn=lambda *args: self.togglePin())
                 ui.Spacer()
 
@@ -95,12 +96,9 @@ class InfoWidgetProvider():
         self._widget_header()
 
     def build_widget(self, viewport_window):
-        # if not self._placer.visible:
-        #     self._placer.visible = True
-
         self._placer = ui.Placer(visible = False, draggable=True, offset_x=100, offset_y = 100)
         with self._placer:
-            with ui.ZStack(width=450, height=10, style={"margin":2}):
+            with ui.ZStack(width=550, height=10, style={"margin":2}):
                 ui.Rectangle(
                     style={
                         # "background_color": cl(0.2),
@@ -130,35 +128,23 @@ class InfoWidgetProvider():
                 }
             )
         self._scrollingFrame.height = ui.Length(300)
-        #with self._zstack:
         with self._scrollingFrame:
-            # with ui.Frame():
-            #     # Create a grid layout manager
-            #     with ui.Grid(ui.Direction.TOP_TO_BOTTOM, selected=True):
-            #     # Add some labels to the grid
-            #         for i in range(40):
-            #             with ui.HStack(width=0):
-            #                 self._J1_label_name = ui.Label(f"J{i}", name="prop_label", word_wrap=True, width=100)
-        # self._rectangle = ui.Rectangle(
-        #     width=800,
-        #     height=800,
-        #     style={
-        #         "background_color": cl("#000000bf"),
-        #         "border_color": cl(0.7),
-        #         "border_width": 0,
-        #         "border_radius": 4,
-        #     }
-        # )
-
             with ui.VStack(style={"font_size": 28,"margin": 8}, height = 50):
-                with ui.HStack(width=0):
+                with ui.HStack():
                     self._J0_label_name = ui.Label("J0", name="prop_label", word_wrap=True, width=100)
                     self._J0_label_val = ui.Label("", name="prop_value")
-                    set_data = []
-                    for i in range(360):
-                        set_data.append(math.cos(math.radians(i)))
 
-                    self._plot = ui.Plot(ui.Type.LINE, -1.0, 1.0, *set_data, width=180, height=100, style={"color": cl.red})
+                    # Add data to the plot
+                    # self.plot.set_data([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+                    # set_data = [1.0, 2.0, 3.0, 4.0, 5.0]
+                    #self.plot = ui.Plot(type=ui.Type.LINE, scale_min=0, scale_max=10)
+
+                    # for i in range(5):
+                    #     set_data.append(math.cos(math.radians(i)))
+
+                    self._plot = ui.Plot(ui.Type.LINE, -60.0, 1.0, width=180, height=100, style={"color": cl.white, "border_width": 3})
+                    #self._j0_arrow = ui.Image("", width=ui.Length(90), height=ui.Length(100), style={"border_width": 0})
+                    #self._plot.set_data(*set_data)
                 with ui.HStack(width=0):
                     self._J1_label_name = ui.Label("J1", name="prop_label", word_wrap=True, width=100)
                     self._J1_label_val = ui.Label("", name="prop_value")
@@ -216,18 +202,27 @@ class InfoWidgetProvider():
                 # path = str(o.pathString)
                 if 'j0' in o.pathString:
                     self._J0_label_val.text = val
-                    # if len(self.history) < 500:
-                    #     self.history.append(float(val))
-                    # else:
-                    #     self.history.pop(0)
-                    #     self.history.append(float(val))
+                    if len(self.history) < 500:
+                        self.history.append(float(val))
+                    else:
+                        self.history.pop(0)
+                        self.history.append(float(val))
 
-                    # self.end = time.time()
-                    # if self.end - self.start >= 10:
-                    #     self._plot.set_data(valueList = *self.history)
-                    #     print(f"StartTime: {str(self.start)}")
-                    #     print(f"EndTime: {str(self.end)}")
-                    #    self.start = self.end
+                    self._j0_last_avg = statistics.fmean(self.history)
+
+                    self.end = time.time()
+                    if self.end - self.start >= 10:
+                        # if self._j0_last_avg >= statistics.fmean(self.history):
+                        #     self._j0_arrow = ui.Image("trending_up_arrow.png", width=ui.Length(90), height=ui.Length(100), style={"border_width": 0})
+                        # else:
+                        #     self._j0_arrow = ui.Image("trending_down_arrow.png", width=ui.Length(90), height=ui.Length(100), style={"border_width": 0})
+                        # self.listener.Revoke()
+                        # self.listener = None
+                        # self._render_body()
+                        self._plot.scale_min = min(self.history)
+                        self._plot.scale_max = max(self.history)
+                        self._plot.set_data(*self.history)
+                        self.start = self.end
                 elif 'j1' in o.pathString:
                     self._J1_label_val.text = val
                 elif 'j2' in o.pathString:
