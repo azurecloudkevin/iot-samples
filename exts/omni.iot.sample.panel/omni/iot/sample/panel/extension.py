@@ -23,6 +23,7 @@ import omni.ext
 import omni.ui as ui
 from pxr import Usd, Sdf, Tf, UsdGeom, UsdShade
 import omni.ui.color_utils as cl
+import omni.kit.material as material
 TRANSLATE_OFFSET = "xformOp:translate:offset"
 ROTATE_SPIN = "xformOp:rotateX:spin"
 
@@ -97,8 +98,12 @@ class LiveRoller:
 
 class MaterialType():
     MATERIAL_ERROR = '/World/Looks/Blue_Glass'
-    MATERIAL_SELECTED = '/World/Looks/Blue_Glass'
-    #MATERIAL_SELECTED = '/World/Looks/ABS_Hard_Leather_Vintage_Rose_07'
+    #MATERIAL_SELECTED = '/World/Looks/Blue_Glass'
+    MATERIAL_SELECTED = '/World/Looks/ABS_Hard_Leather_Vintage_Rose_07'
+    MDL_NAME = 'mdl::uber'
+    MDL_TYPE = 'UsdPreviewSurface'
+
+
 
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
 # instantiated when extension gets enabled and `on_startup(ext_id)` will be called. Later when extension gets disabled
@@ -332,25 +337,31 @@ class OmniIotSamplePanelExtension(omni.ext.IExt):
 
     # ===================== prim highlight START =======================
 
-    def highlight_prim(self, prim_path: str, material_path:str = MaterialType.MATERIAL_SELECTED):
-        mtl = UsdShade.Material.Get(self._stage, Sdf.Path(material_path))
-        prim = self._stage.GetPrimAtPath(prim_path)
-        prim.ApplyAPI(UsdShade.MaterialBindingAPI)
-        UsdShade.MaterialBindingAPI(prim).Bind(mtl)
-        myRel = prim.CreateRelationship("myRel")
-        #UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(prim.GetAuthoredPropertyNames()[0], UsdShade.Tokens.strongerThanDescendants)
-        #UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(bindingRel, UsdShade.Tokens.strongerThanDescendants)
-        UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(myRel, UsdShade.Tokens.strongerThanDescendants)
-        self._hightlighted_prims[str(prim_path)]=''
+    # def highlight_prim(self, prim_path: str, material_path:str = MaterialType.MATERIAL_SELECTED):
+    #     mtl = UsdShade.Material.Get(self._stage, Sdf.Path(material_path))
+    #     prim = self._stage.GetPrimAtPath(prim_path)
+    #     prim.ApplyAPI(UsdShade.MaterialBindingAPI)
+    #     UsdShade.MaterialBindingAPI(prim).Bind(mtl)
+    #     myRel = prim.CreateRelationship("myRel")
+    #     #UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(prim.GetAuthoredPropertyNames()[0], UsdShade.Tokens.strongerThanDescendants)
+    #     #UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(bindingRel, UsdShade.Tokens.strongerThanDescendants)
+    #     UsdShade.MaterialBindingAPI(prim).SetMaterialBindingStrength(myRel, UsdShade.Tokens.strongerThanDescendants)
+    #     self._hightlighted_prims[str(prim_path)]=''
 
-    def clear_prim_highlight(self, prim_path: str):
-        prim = self._stage.GetPrimAtPath(prim_path)
-        try:
-            # print(f"clear prim :::::: {prim_path}")
-            UsdShade.MaterialBindingAPI(prim).UnbindDirectBinding()
+    # def clear_prim_highlight(self, prim_path: str):
+    #     prim = self._stage.GetPrimAtPath(prim_path)
+    #     try:
+    #         # print(f"clear prim :::::: {prim_path}")
+    #         UsdShade.MaterialBindingAPI(prim).UnbindDirectBinding()
 
-            del self._hightlighted_prims[str(prim_path)]
-        except Exception as e:
-            print(e)
+    #         del self._hightlighted_prims[str(prim_path)]
+    #     except Exception as e:
+    #         print(e)
+
+    def highlight_prim():
+        material.library.CreateAndBindMdlMaterialFromLibrary(mdl_name=MaterialType.MATERIAL_SELECTED).do()
+
+    def clear_prim_highlight():
+        material.library.CreateAndBindMdlMaterialFromLibrary(mdl_name=MaterialType.MATERIAL_SELECTED).undo()
 
 # ===================== prim highlight END =======================
