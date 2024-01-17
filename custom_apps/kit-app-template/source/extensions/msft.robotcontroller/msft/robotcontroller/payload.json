@@ -1,0 +1,31 @@
+{
+    "Timestamp": "2023-11-01 20:49:00.142347",
+    "Payload": {
+        "RobotPositionJ0": {
+            "Value": 0.5811427235603333,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        },
+        "RobotPositionJ1": {
+            "Value": -0.910862684,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        },
+        "RobotPositionJ2": {
+            "Value": -0.3767242,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        },
+        "RobotPositionJ3": {
+            "Value": -0.001758,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        },
+        "RobotPositionJ4": {
+            "Value": -0.5845108,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        },
+        "RobotPositionJ5": {
+            "Value": -0.9215088,
+            "SouceTimestamp": "2023-11-01 20:49:00.142347"
+        }
+    },
+    "DataSetWriterName": "robot",
+    "SequenceNumber": 2209
+}

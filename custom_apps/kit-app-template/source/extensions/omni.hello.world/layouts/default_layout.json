@@ -1,0 +1,124 @@
+[
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "dock_id": 1,
+            "dock_tab_bar_enabled": true,
+            "dock_tab_bar_visible": true,
+            "height": 1345.0,
+            "position_x": 0.0,
+            "position_y": 24.0,
+            "selected_in_dock": true,
+            "title": "Viewport",
+            "visible": true,
+            "width": 2128.0
+          },
+          {
+            "dock_id": 1,
+            "height": 1345.0,
+            "position_x": 0.0,
+            "position_y": 24.0,
+            "selected_in_dock": false,
+            "title": "Console",
+            "visible": true,
+            "width": 2128.0
+          }
+        ],
+        "dock_id": 1,
+        "position": "LEFT"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "dock_id": 3,
+                "height": 1345.0,
+                "position_x": 1791.0,
+                "position_y": 24.0,
+                "selected_in_dock": false,
+                "title": "Stage",
+                "visible": true,
+                "width": 428.0
+              },
+              {
+                "dock_id": 3,
+                "height": 1345.0,
+                "position_x": 60.0,
+                "position_y": 60.0,
+                "selected_in_dock": false,
+                "title": "Render Settings",
+                "visible": true,
+                "width": 428.0
+              },
+              {
+                "dock_id": 3,
+                "dock_tab_bar_enabled": true,
+                "dock_tab_bar_visible": true,
+                "height": 1345.0,
+                "position_x": 2132.0,
+                "position_y": 24.0,
+                "selected_in_dock": true,
+                "title": "Sample IoT Data",
+                "visible": true,
+                "width": 428.0
+              },
+              {
+                "dock_id": 3,
+                "height": 1345.0,
+                "position_x": 2132.0,
+                "position_y": 24.0,
+                "selected_in_dock": false,
+                "title": "Extensions",
+                "visible": true,
+                "width": 428.0
+              }
+            ],
+            "dock_id": 3,
+            "position": "TOP"
+          },
+          {
+            "children": [],
+            "dock_id": 4,
+            "position": "BOTTOM"
+          }
+        ],
+        "dock_id": 2,
+        "position": "RIGHT"
+      }
+    ],
+    "dock_id": 3358485147
+  },
+  {
+    "dock_id": 0,
+    "height": 151.0,
+    "position_x": 1791.0,
+    "position_y": 1218.0,
+    "selected_in_dock": false,
+    "title": "VS Code Link",
+    "visible": false,
+    "width": 769.0
+  },
+  {
+    "dock_id": 0,
+    "height": 114.0,
+    "position_x": 3.4028234663852886e+38,
+    "position_y": 3.4028234663852886e+38,
+    "selected_in_dock": false,
+    "title": "omni.ui.scene 1978284110720",
+    "visible": false,
+    "width": 210.8000030517578
+  },
+  {
+    "dock_id": 0,
+    "height": 0.0,
+    "position_x": 3.4028234663852886e+38,
+    "position_y": 3.4028234663852886e+38,
+    "selected_in_dock": false,
+    "title": "Options",
+    "visible": false,
+    "width": 220.0
+  }
+]
