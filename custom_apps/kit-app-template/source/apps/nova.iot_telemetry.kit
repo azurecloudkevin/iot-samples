@@ -15,11 +15,24 @@ keywords = ["app"]
 "omni.hello.world" = {}
 "omni.kit.menu.file" = {}
 "omni.app.setup" = {order = -6000}
-# Viewport Bundle
-"omni.kit.viewport.bundle" = {order = -5000}
+# Viewport bundle extensions - selectively
+"omni.kit.viewport.window" = {}
+"omni.kit.manipulator.camera" = {}
+"omni.kit.manipulator.selection" = {}
+"omni.kit.window.drop_support" = {}
+"omni.kit.viewport.menubar.camera" = {}
+"omni.kit.viewport.menubar.lighting" = {}
+"omni.kit.viewport.menubar.markup" = {}
+"omni.kit.viewport.menubar.waypoint" = {}
 "omni.resourcemonitor" = {}
 #### Stage
 "omni.kit.window.stage" = {}
+
+# this is the Render Settings 2.0
+"omni.rtx.settings.core" = {}
+
+# Load the RTX rendering bundle
+"omni.kit.viewport.rtx" = {}
 
 # "omni.example.ui_scene.widget_info" = {}
 # "omni.iot.sample.panel" = {}
@@ -35,7 +48,7 @@ keywords = ["app"]
 "omni.rtx.shadercache.vulkan" = {}
 
 # VS Code debug
-"omni.kit.debug.vscode" = {order = -1000}
+# "omni.kit.debug.vscode" = {order = -1000}
 
 
 # DX shader caches (windows only)
@@ -62,6 +75,24 @@ exts."omni.kit.renderer.core".compatibilityMode = true
 layout.default = "${app}/../default_layout.json"
 extensions.installUntrustedExtensions=true
 
+[settings.app.extensions]
+skipPublishVerification = false
+registryEnabled = true
+generatedVersionLockExclude = [
+]
+excluded = [
+    "omni.kit.viewport.menubar.settings",
+    "omni.kit.viewport.menubar.render",
+]
+
+[settings.app.extensions."filter:platform"."linux-x86_64"]
+excluded = [
+    "omni.kit.window.modifier.titlebar",
+    "omni.rtx.shadercache.d3d12",
+    "omni.kit.viewport.menubar.settings",
+    "omni.kit.viewport.menubar.render",
+]
+
 # Register extension folders from this repo in kit
 # These are the paths where Kit looks for extensions
 # Your application is using Extensions from your application
@@ -69,7 +100,7 @@ extensions.installUntrustedExtensions=true
 # see we also add the Extension from the Base application using their extscache
 [settings.app.exts]
 # folders.'++' = ["${app}/../extensions"]
-folders.'++' = ["${app}/../extensions", "${app}/../extscache/"]
+folders.'++' = ["${app}/../exts", "${app}/../extscache/"]
 
 # Public extension registries
 [settings.exts."omni.kit.registry.nucleus"]
@@ -88,7 +119,7 @@ registries = [
 # Version lock for all dependencies:
 [settings.app.exts]
 enabled = [
-	"omni.kit.viewport.menubar.settings-105.0.9",
+
 ]
 
 ########################################################################################################################
