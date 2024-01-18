@@ -44,4 +44,5 @@ name = "omni.iot.sample.panel"
 # Extra dependencies only to be used during test run
 dependencies = [
     "omni.kit.ui_test" # UI testing extension
+    "omni.kit.materials" # Omni mzterials extension
 ]
