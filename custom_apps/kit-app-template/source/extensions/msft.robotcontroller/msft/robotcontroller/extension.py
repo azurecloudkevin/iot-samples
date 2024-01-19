@@ -12,7 +12,9 @@ from .robotmotion import RobotMotion
 import omni.kit.usd.layers as layers
 from dotenv import load_dotenv
 
-env = f"{Path(__file__).parents[5]}\\.env"
+env = f"{Path(__file__).parents[4]}\\.env"
+
+print(f"Looking for env file at {env}")
 
 load_dotenv(env)
 
