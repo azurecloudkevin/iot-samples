@@ -1,0 +1,103 @@
+[
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "dock_id": 1,
+            "dock_tab_bar_enabled": true,
+            "dock_tab_bar_visible": true,
+            "height": 1345.0,
+            "position_x": 0.0,
+            "position_y": 24.0,
+            "selected_in_dock": true,
+            "title": "Viewport Next",
+            "visible": true,
+            "width": 1956.0
+          },
+          {
+            "dock_id": 1,
+            "height": 1345.0,
+            "position_x": 0.0,
+            "position_y": 24.0,
+            "selected_in_dock": false,
+            "title": "Render Settings",
+            "visible": true,
+            "width": 1956.0
+          }
+        ],
+        "dock_id": 1,
+        "position": "LEFT"
+      },
+      {
+        "children": [
+          {
+            "dock_id": 2,
+            "dock_tab_bar_enabled": true,
+            "dock_tab_bar_visible": true,
+            "height": 1345.0,
+            "position_x": 1960.0,
+            "position_y": 24.0,
+            "selected_in_dock": true,
+            "title": "Stage",
+            "visible": true,
+            "width": 600.0
+          }
+        ],
+        "dock_id": 2,
+        "position": "RIGHT"
+      }
+    ],
+    "dock_id": 3358485147
+  },
+  {
+    "dock_id": 0,
+    "height": 800.0,
+    "position_x": 601.0,
+    "position_y": 385.0,
+    "selected_in_dock": false,
+    "title": "Extensions",
+    "visible": false,
+    "width": 1300.0
+  },
+  {
+    "dock_id": 0,
+    "height": 650.0,
+    "position_x": 3.4028234663852886e+38,
+    "position_y": 3.4028234663852886e+38,
+    "selected_in_dock": false,
+    "title": "Playlist",
+    "visible": false,
+    "width": 600.0
+  },
+  {
+    "dock_id": 0,
+    "height": 114.0,
+    "position_x": 3.4028234663852886e+38,
+    "position_y": 3.4028234663852886e+38,
+    "selected_in_dock": false,
+    "title": "omni.ui.scene 1454139794128",
+    "visible": false,
+    "width": 210.8000030517578
+  },
+  {
+    "dock_id": 0,
+    "height": 0.0,
+    "position_x": 3.4028234663852886e+38,
+    "position_y": 3.4028234663852886e+38,
+    "selected_in_dock": false,
+    "title": "Options",
+    "visible": false,
+    "width": 220.0
+  },
+  {
+    "dock_id": 0,
+    "height": 246.0,
+    "position_x": 1030.0,
+    "position_y": 561.0,
+    "selected_in_dock": false,
+    "title": "Confirm File Deletion",
+    "visible": false,
+    "width": 500.0
+  }
+]
