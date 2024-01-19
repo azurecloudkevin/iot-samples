@@ -64,7 +64,7 @@ keywords = ["app"]
 renderer.enabled='rtx'
 renderer.active='rtx'
 app.kit.editor.setup = true
-#app.layout.default = "${app}/../default_layout.json"
+app.layout.default = "${app}/../exts/omni.hello.world/layouts/default_layout.json"
 exts."omni.kit.camera".camera.zoomSpeed = 0
 
 [settings.app]
@@ -72,7 +72,6 @@ fastShutdown = true
 content.emptyStageOnStart = true
 exts."omni.kit.viewport.window".startup.windowName = "Viewport"
 exts."omni.kit.renderer.core".compatibilityMode = true
-layout.default = "${app}/../default_layout.json"
 extensions.installUntrustedExtensions=true
 
 [settings.app.extensions]
