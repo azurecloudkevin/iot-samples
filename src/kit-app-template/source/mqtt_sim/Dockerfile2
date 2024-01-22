@@ -1,0 +1,41 @@
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.10-slim
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
+RUN adduser -u 5678 --disabled-password --gecos "" appuser
+# Create a directory "certs" in the container which we can use to mount a volume
+
+RUN mkdir /certs
+
+WORKDIR /app
+
+ADD --chown=appuser:appuser ./requirements.txt /app/
+# Copy the source directory into the container
+# This is done separately to ensure that changes in the source directory
+# don't invalidate the cache for the rest of the copied files
+ADD --chown=appuser:appuser ./ /app/source/mqtt_sim
+RUN chown -R appuser:appuser /certs
+
+USER appuser
+
+ENV OMNI_SCRIPT = "/app/source/mqtt_sim/app.py"
+ENV SIM_CERT_PATH = "/app/source/mqtt_sim/sim-authn-ID.pem"
+ENV SIM_KEY_PATH = "/app/source/mqtt_sim/sim-authn-ID.key"
+ENV CSV_PATH = "/app/source/mqtt_sim/pos.csv"
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:80/health || exit 1
+
+ENTRYPOINT "python3" "/app/source/mqtt_sim/app.py" --sim_cert_path "/app/source/mqtt_sim/sim-authn-ID.pem" --sim_key_path "/app/source/mqtt_sim/sim-authn-ID.key" --csv_path "/app/source/mqtt_sim/pos.csv" & "python3" "source/mqtt_sim/health_check.py"

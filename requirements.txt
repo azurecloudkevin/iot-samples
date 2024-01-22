@@ -1,4 +1,0 @@
-pandas
-paho-mqtt
-usd-core
-python-dotenv
