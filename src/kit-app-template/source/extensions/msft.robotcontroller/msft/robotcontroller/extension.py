@@ -32,7 +32,13 @@ robot_prims = [
     "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link3piv_003/link4piv_003/link4old_003/Visuals_4_003/unnamed_4_003/RS007N_J4_003/RS007_Body_arm_top_003/Scene_004/Scene_004"
 ]
 
-
+class MaterialType():
+    MATERIAL_ERROR = '/World/Looks/Blue_Glass'
+    #MATERIAL_SELECTED = '/World/Looks/Blue_Glass'
+    MATERIAL_SELECTED = '/World/Looks/ABS_Hard_Leather_Vintage_Rose_07'
+    MDL_NAME = 'mdl::uber'
+    MDL_TYPE = 'UsdPreviewSurface'
+    
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
 # instantiated when extension gets enabled and `on_startup(ext_id)` will be called. Later when extension gets disabled
 # on_shutdown() is called.
