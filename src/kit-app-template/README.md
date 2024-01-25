@@ -31,10 +31,12 @@ Name | Type | Required | Example
 robot_base_path | string | Y | /World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003 |
 robot_joint_paths | string | Y | link1piv_003, link2piv_003, link3piv_003 |
 omniverse_host | string | Y | contonso.azurenucleus.co.uk |
+
+These settings are required for the application and must be present in the app package root folder.
  
 ## Robot Simulator
  
-This repo contains a robot arm [simulator](./source/mqtt_sim/) that can be used when the physical magnemotion data stream is not available. This module loops over data in a [csv](./source/mqtt_sim/pos.csv) file and sends the data to the configured mqtt broker. The simulator is deployed as a docker container in the cloud or can be ran locally for testing.
+This repo contains a robot arm [simulator](./source/mqtt_sim/) that can be used when the physical magnemotion data stream is not available. This module loops over data in a [csv](./source/mqtt_sim/pos.csv) file and sends the data to the configured mqtt broker. The simulator can be deployed as a docker container in the cloud or ran locally for testing.
  
 ## Running robot simulator with Docker
  
