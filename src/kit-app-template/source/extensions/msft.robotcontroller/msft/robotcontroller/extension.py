@@ -1,6 +1,7 @@
 import os
 import omni.ext
 import omni.kit.commands
+import omni.kit.material as material
 import omni.usd
 import omni.client
 from .live_edit_session import LiveEditSession
@@ -22,6 +23,14 @@ load_dotenv(env)
 host = os.getenv('omniverse_host')
 robot_base_path = os.getenv('robot_base_path')
 jointList = os.getenv('robot_joint_paths')
+robot_prims = [
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/Visuals_1_003/unnamed_1_003/RS007N_J1_003/RS007_Body_mid_A_003/Scene_001/Scene_001",
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link2_003/Visuals_2_003/unnamed_2_003/RS007N_J2_003/RS007_Body_arm_mid_003/Scene_002/Scene_002",
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link3piv_003/link3_003/Visuals_3_003/unnamed_3_003/RS007N_J3_003/RS007_Body_arm_upper_004/Scene_003/Scene_003",
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link3piv_003/link4piv_003/link4old_003/Visuals_4_003/unnamed_4_003/RS007N_J4_003/RS007_Body_arm_top_003/Scene_004/Scene_004",
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link3piv_003/link4piv_003/link5piv_003/link5_003/Visuals_5_003/unnamed_5_003/RS007N_J5_003/RS007_gripper_A_003/Scene_005/Scene_005"
+    "/World/PCR_8FT2_Only_Robot/khi_rs007n_vac_UNIT1/world_003/base_link_003/link1piv_003/link2piv_003/link3piv_003/link4piv_003/link4old_003/Visuals_4_003/unnamed_4_003/RS007N_J4_003/RS007_Body_arm_top_003/Scene_004/Scene_004"
+]
 
 
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
@@ -145,7 +154,20 @@ class MsftOmniAnimateExtension(omni.ext.IExt):
                     self.robot.SetAngleDegrees(4, val)
                 elif "j5" in o.pathString:
                     self.robot.SetAngleDegrees(5, val)
+                elif "vacuum_alert" in o.pathString:
+                    if val == 1:
+                        for prim in robot_prims:
+                            self.clear_prim_highlight(prim)
+                    else:
+                        for prim in robot_prims:
+                            self.highlight_prim(prim)    
                 else:
                     continue
         except Exception as e:
             print(f"An error occurred: {e}")
+
+        def highlight_prim():
+            material.library.CreateAndBindMdlMaterialFromLibrary(mdl_name=MaterialType.MATERIAL_SELECTED).do()
+
+        def clear_prim_highlight():
+            material.library.CreateAndBindMdlMaterialFromLibrary(mdl_name=MaterialType.MATERIAL_SELECTED).undo()
